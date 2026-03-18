@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beyond the Frame</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+:root {
+  --parchment:#f7f2e8; --parchment-dark:#ede5d4; --parchment-mid:#e0d5be; --white:#fff;
+  --gold:#c9943a; --gold-light:#e8c078; --gold-pale:#fdf3e0;
+  --terracotta:#b5492a; --terracotta-hover:#9c3d22; --terracotta-pale:#f8ebe5;
+  --navy:#1e2b42; --navy-mid:#2d3f5c; --navy-soft:#3d5070; --navy-pale:#e8ecf3;
+  --ink:#18140e; --ink-mid:#3a2e1e; --ink-muted:#6b5c46; --fog:#9a8c78; --error:#7a2020;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Inter',sans-serif; background:var(--parchment); color:var(--ink); min-height:100vh; }
+
+header { background:var(--navy); position:relative; overflow:hidden; }
+.header-topo { position:absolute; inset:0; opacity:0.06; background-image:repeating-linear-gradient(0deg,transparent,transparent 18px,rgba(255,255,255,.4) 18px,rgba(255,255,255,.4) 19px),repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(255,255,255,.15) 28px,rgba(255,255,255,.15) 29px); }
+.header-deco { position:absolute; right:0; top:50%; transform:translateY(-50%); opacity:0.14; pointer-events:none; }
+.header-inner { position:relative; z-index:2; padding:1.8rem 2rem 1.7rem; }
+.header-eyebrow { font-family:'Inter',sans-serif; font-size:0.58rem; font-weight:500; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold-light); margin-bottom:0.35rem; }
+.header-title { font-family:'DM Serif Display',serif; font-size:2.1rem; font-weight:400; color:#fff; line-height:1; }
+.header-title em { color:var(--gold-light); font-style:italic; }
+.header-rule { display:flex; align-items:center; gap:0.7rem; margin:0.65rem 0 0.45rem; }
+.header-rule-line { height:1px; width:28px; background:var(--gold-light); opacity:0.4; }
+.header-rule-dot { width:4px; height:4px; border-radius:50%; background:var(--gold-light); opacity:0.5; }
+.header-sub { font-family:'Lora',serif; font-size:0.72rem; color:#a8b8cc; font-style:italic; letter-spacing:0.04em; }
+
+#sub-nav { display:none; background:var(--white); border-bottom:1px solid var(--parchment-mid); padding:0.6rem 2rem; align-items:center; justify-content:space-between; }
+#sub-nav.visible { display:flex; }
+.sub-nav-back { display:flex; align-items:center; gap:0.35rem; font-size:0.78rem; color:var(--ink-muted); cursor:pointer; background:none; border:none; font-family:'Inter',sans-serif; transition:color 0.14s; padding:0; }
+.sub-nav-back:hover { color:var(--terracotta); }
+.sub-nav-back svg { width:13px; height:13px; }
+.sub-nav-mode { font-family:'Lora',serif; font-size:0.72rem; font-style:italic; color:var(--navy-mid); }
+
+main { max-width:820px; margin:0 auto; padding:2.8rem 1.4rem 5rem; }
+
+.home-intro { font-family:'DM Serif Display',serif; font-size:1.55rem; color:var(--ink); line-height:1.55; max-width:520px; margin:0 auto 0.65rem; font-weight:400; text-align:center; }
+.home-sub { font-family:'Lora',serif; font-size:0.92rem; color:var(--ink-muted); text-align:center; margin-bottom:2.6rem; line-height:1.7; font-style:italic; }
+
+.mode-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.mode-card { background:var(--white); border:1px solid var(--parchment-mid); padding:1.9rem 1.7rem 1.7rem; cursor:pointer; transition:all 0.2s ease; position:relative; overflow:hidden; }
+.mode-card:first-child { border-radius:12px 12px 0 0; border-bottom:none; }
+.mode-card:last-child { border-radius:0 0 12px 12px; }
+@media(min-width:580px){
+  .mode-card:first-child { border-radius:12px 0 0 12px; border-bottom:1px solid var(--parchment-mid); border-right:none; }
+  .mode-card:last-child { border-radius:0 12px 12px 0; }
+}
+.mode-card::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--terracotta); opacity:0; transition:opacity 0.2s; }
+.mode-card:hover { background:var(--gold-pale); }
+.mode-card:hover::after { opacity:1; }
+.card-icon { width:44px; height:44px; border-radius:10px; background:var(--navy-pale); display:flex; align-items:center; justify-content:center; margin-bottom:1.1rem; transition:background 0.2s; }
+.mode-card:hover .card-icon { background:#dce3f0; }
+.card-icon svg { width:22px; height:22px; }
+.card-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); font-weight:400; margin-bottom:0.45rem; }
+.card-desc { font-family:'Lora',serif; font-size:0.85rem; color:var(--ink-muted); line-height:1.7; margin-bottom:0.7rem; }
+.card-hint { font-family:'Inter',sans-serif; font-size:0.75rem; color:var(--navy-soft); font-weight:500; }
+
+.home-avatar { display:flex; align-items:center; gap:0.75rem; justify-content:center; margin-top:2.2rem; }
+.avatar-ring { width:48px; height:48px; border-radius:50%; border:2px dashed var(--parchment-mid); background:var(--navy-pale); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color 0.15s; overflow:hidden; position:relative; flex-shrink:0; }
+.avatar-ring:hover { border-color:var(--navy-soft); }
+.avatar-ring img { width:100%; height:100%; object-fit:cover; object-position:center 65%; border-radius:50%; }
+.avatar-text strong { color:var(--ink-mid); font-weight:500; display:block; font-size:0.82rem; font-family:'Inter',sans-serif; }
+.avatar-text { font-family:'Inter',sans-serif; font-size:0.72rem; color:var(--ink-muted); }
+
+#chat-view { display:none; }
+.chat-empty { text-align:center; padding:2rem 1.2rem 1.8rem; color:var(--ink-muted); font-size:0.88rem; line-height:1.75; border:1px dashed var(--parchment-mid); border-radius:10px; margin-bottom:1.2rem; display:none; background:rgba(255,255,255,0.5); }
+.chat-empty.visible { display:block; }
+.chat-empty strong { display:block; font-family:'DM Serif Display',serif; font-size:1.1rem; font-weight:400; color:var(--ink-mid); margin-bottom:0.4rem; }
+.chat-empty p { font-family:'Lora',serif; font-style:italic; }
+
+.loading-status { display:none; align-items:center; gap:0.75rem; padding:0.7rem 1rem; background:var(--gold-pale); border:1px solid #e8d09a; border-radius:8px; margin-bottom:0.8rem; font-family:'Lora',serif; font-size:0.82rem; color:var(--ink-mid); font-style:italic; }
+.loading-status.visible { display:flex; }
+.loading-status svg { width:16px; height:16px; flex-shrink:0; animation:spin 1.4s linear infinite; color:var(--gold); }
+.loading-cancel { margin-left:auto; font-family:'Inter',sans-serif; font-size:0.7rem; font-style:normal; color:var(--fog); cursor:pointer; text-decoration:underline; flex-shrink:0; }
+.loading-cancel:hover { color:var(--terracotta); }
+@keyframes spin { 100%{transform:rotate(360deg)} }
+
+#messages { min-height:20px; margin-bottom:0.8rem; display:flex; flex-direction:column; gap:1.2rem; }
+
+.msg { display:flex; flex-direction:column; }
+.msg.user { align-items:flex-end; }
+.msg.user .bubble { background:var(--navy); color:#e8ecf3; border-radius:14px 14px 3px 14px; padding:0.7rem 1rem; max-width:74%; font-family:'Inter',sans-serif; font-size:0.875rem; line-height:1.6; }
+.pj-intro { display:flex; align-items:flex-start; gap:0.85rem; }
+.pj-avatar { border-radius:50%; flex-shrink:0; background:var(--navy-pale); border:2px solid #c0cde0; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.pj-name { font-family:'Inter',sans-serif; font-size:0.64rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--navy-soft); margin-bottom:0.25rem; }
+.msg.assistant .bubble { background:var(--white); border:1px solid var(--parchment-mid); border-left:3px solid var(--gold); border-radius:0 12px 12px 12px; padding:1.2rem 1.4rem; max-width:100%; font-family:'Lora',serif; font-size:0.93rem; line-height:1.85; color:var(--ink-mid); }
+.msg.assistant .bubble h1,.msg.assistant .bubble h2,.msg.assistant .bubble h3 { font-family:'DM Serif Display',serif; font-weight:400; color:var(--navy-mid); margin:1.3rem 0 0.45rem; line-height:1.2; }
+.msg.assistant .bubble h1 { font-size:1.3rem; }
+.msg.assistant .bubble h2 { font-size:1.1rem; }
+.msg.assistant .bubble h3 { font-size:1rem; color:var(--navy-soft); }
+.msg.assistant .bubble p { margin-bottom:0.6rem; }
+.msg.assistant .bubble ul,.msg.assistant .bubble ol { padding-left:1.4rem; margin-bottom:0.6rem; }
+.msg.assistant .bubble li { margin-bottom:0.25rem; line-height:1.7; }
+.msg.assistant .bubble table { border-collapse:collapse; width:100%; margin:0.9rem 0; font-family:'Inter',sans-serif; font-size:0.8rem; }
+.msg.assistant .bubble th { background:var(--navy-pale); padding:0.42rem 0.7rem; text-align:left; font-weight:500; color:var(--navy); font-size:0.73rem; letter-spacing:0.05em; text-transform:uppercase; }
+.msg.assistant .bubble td { padding:0.35rem 0.7rem; border-bottom:1px solid var(--parchment-dark); color:var(--ink-mid); }
+.msg.assistant .bubble code { background:var(--parchment-dark); padding:0.1rem 0.3rem; border-radius:3px; font-size:0.8rem; font-family:monospace; color:var(--navy-mid); }
+.msg.assistant .bubble pre { background:var(--parchment-dark); padding:0.9rem; border-radius:0; border-left:3px solid var(--gold); margin:0.65rem 0; overflow-x:auto; }
+.msg.assistant .bubble pre code { background:none; padding:0; color:var(--ink-mid); }
+.msg.assistant .bubble blockquote { border-left:3px solid var(--terracotta); padding-left:0.9rem; margin:0.7rem 0; color:var(--ink-muted); border-radius:0; font-style:italic; }
+.msg.assistant .bubble strong { color:var(--navy-mid); font-weight:600; }
+.msg.assistant .bubble hr { border:none; border-top:1px solid var(--parchment-dark); margin:0.9rem 0; }
+.msg.assistant .bubble a { color:var(--terracotta); }
+
+.refinement-cue { margin-top:0.7rem; padding:0.8rem 1.1rem; background:var(--gold-pale); border:1px solid #e8d09a; border-radius:8px; font-family:'Lora',serif; font-size:0.82rem; color:var(--ink-mid); line-height:1.6; font-style:italic; }
+.refinement-cue strong { display:block; font-family:'Inter',sans-serif; font-weight:500; margin-bottom:0.15rem; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); font-style:normal; }
+
+.error-banner { background:#fdf0f0; border:1px solid #e8c0c0; border-radius:8px; padding:0.65rem 1rem; font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--error); margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
+.error-banner svg { width:16px; height:16px; flex-shrink:0; }
+
+.dest-picker { margin-top:0.8rem; }
+.dest-picker-label { font-family:'Inter',sans-serif; font-size:0.7rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--navy-soft); margin-bottom:0.55rem; }
+.dest-options { display:flex; flex-direction:column; gap:0.4rem; }
+.dest-option { display:flex; align-items:center; gap:0.65rem; background:var(--white); border:1px solid var(--parchment-mid); border-radius:8px; padding:0.6rem 0.9rem; cursor:pointer; transition:all 0.15s; font-family:'Lora',serif; font-size:0.88rem; color:var(--ink-mid); text-align:left; }
+.dest-option:hover { border-color:var(--navy-soft); color:var(--navy); background:var(--navy-pale); }
+.dest-option.selected { border-color:var(--navy-mid); background:var(--navy-pale); color:var(--navy); }
+.dest-option .opt-key { font-family:'Inter',sans-serif; font-weight:500; color:var(--gold); font-size:0.75rem; min-width:16px; }
+.dest-other { display:none; margin-top:0.4rem; gap:0.4rem; }
+.dest-other.visible { display:flex; }
+.dest-other input { flex:1; border:1px solid var(--parchment-mid); border-radius:8px; padding:0.5rem 0.9rem; font-family:'Lora',serif; font-size:0.88rem; color:var(--ink); outline:none; transition:border-color 0.14s; background:var(--white); }
+.dest-other input:focus { border-color:var(--navy-soft); }
+.btn-plan-now { background:var(--navy); color:#fff; border:none; border-radius:7px; padding:0.48rem 1.1rem; font-family:'DM Serif Display',serif; font-size:0.95rem; cursor:pointer; white-space:nowrap; transition:background 0.14s; flex-shrink:0; }
+.btn-plan-now:hover { background:var(--navy-mid); }
+.btn-plan-now:disabled { background:var(--fog); cursor:not-allowed; }
+
+.save-bar { display:none; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.7rem 0 0.9rem; border-top:1px solid var(--parchment-mid); margin-bottom:0.8rem; }
+.save-bar.visible { display:flex; }
+.save-bar-label { font-family:'Lora',serif; font-size:0.78rem; color:var(--ink-muted); font-style:italic; }
+.btn-save { background:none; border:1px solid var(--parchment-mid); border-radius:7px; padding:0.38rem 0.9rem; font-size:0.74rem; color:var(--ink-muted); cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.14s; }
+.btn-save:hover { border-color:var(--navy-mid); color:var(--navy-mid); }
+
+.input-wrap { background:var(--white); border:1px solid var(--parchment-mid); border-radius:12px; overflow:hidden; transition:border-color 0.15s; }
+.input-wrap:focus-within { border-color:var(--navy-soft); }
+.input-label { padding:0.55rem 1rem 0; font-family:'Inter',sans-serif; font-size:0.62rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--navy-soft); }
+#user-input { width:100%; border:none; background:transparent; resize:none; font-family:'Lora',serif; font-size:0.93rem; color:var(--ink); outline:none; line-height:1.65; min-height:56px; max-height:120px; overflow-y:auto; padding:0.35rem 1rem 0; }
+#user-input::placeholder { color:var(--fog); font-style:italic; }
+.input-row { display:flex; justify-content:space-between; align-items:center; padding:0.4rem 1rem 0.6rem; }
+.char-hint { font-size:0.65rem; color:var(--fog); font-family:'Inter',sans-serif; }
+.btn-send { background:var(--terracotta); color:#fff; border:none; border-radius:7px; padding:0.48rem 1.25rem; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.14s; }
+.btn-send:hover { background:var(--terracotta-hover); }
+.btn-send:disabled { background:var(--fog); cursor:not-allowed; }
+
+.typing { display:flex; gap:5px; align-items:center; padding:0.55rem 0; }
+.typing span { width:7px; height:7px; background:var(--parchment-mid); border-radius:50%; animation:bob 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay:0.2s; }
+.typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes bob { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+.overlay { display:none; position:fixed; inset:0; background:rgba(20,16,10,0.6); z-index:100; align-items:flex-start; justify-content:center; padding:2rem 1rem; overflow-y:auto; }
+.overlay.open { display:flex; }
+.overlay-box { background:var(--parchment); border-radius:14px; max-width:720px; width:100%; padding:2rem 2.2rem 1.5rem; margin:auto; border:1px solid var(--parchment-mid); }
+.overlay-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.2rem; gap:1rem; }
+.overlay-title { font-family:'DM Serif Display',serif; font-size:1.25rem; color:var(--navy); font-weight:400; }
+.overlay-meta { font-family:'Lora',serif; font-size:0.74rem; color:var(--ink-muted); margin-top:0.2rem; font-style:italic; }
+.overlay-close { background:none; border:none; font-size:1.4rem; color:var(--ink-muted); cursor:pointer; line-height:1; padding:0; flex-shrink:0; }
+.overlay-close:hover { color:var(--terracotta); }
+.overlay-actions { display:flex; gap:0.5rem; margin-bottom:1.2rem; padding-bottom:1rem; border-bottom:1px solid var(--parchment-mid); }
+.overlay-btn { background:none; border:1px solid var(--parchment-mid); border-radius:7px; padding:0.42rem 1rem; font-size:0.78rem; color:var(--ink-muted); cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.14s; }
+.overlay-btn:hover { border-color:var(--navy-mid); color:var(--navy-mid); }
+.overlay-body { font-family:'Lora',serif; font-size:0.92rem; line-height:1.85; color:var(--ink-mid); max-height:60vh; overflow-y:auto; padding-right:0.5rem; }
+.overlay-body h1,.overlay-body h2,.overlay-body h3 { font-family:'DM Serif Display',serif; font-weight:400; color:var(--navy-mid); margin:1.3rem 0 0.45rem; }
+.overlay-body h1 { font-size:1.25rem; border-bottom:1px solid var(--parchment-mid); padding-bottom:0.35rem; }
+.overlay-body h2 { font-size:1.1rem; }
+.overlay-body h3 { font-size:0.98rem; color:var(--navy-soft); }
+.overlay-body p { margin-bottom:0.65rem; }
+.overlay-body ul,.overlay-body ol { padding-left:1.4rem; margin-bottom:0.65rem; }
+.overlay-body li { margin-bottom:0.25rem; }
+.overlay-body table { border-collapse:collapse; width:100%; font-family:'Inter',sans-serif; font-size:0.82rem; margin:0.9rem 0; }
+.overlay-body th { background:var(--navy-pale); padding:7px 10px; text-align:left; color:var(--navy); font-weight:600; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; }
+.overlay-body td { padding:6px 10px; border-bottom:1px solid var(--parchment-dark); vertical-align:top; }
+.overlay-body blockquote { border-left:3px solid var(--terracotta); padding:0.4rem 0 0.4rem 1rem; margin:0.8rem 0; color:var(--ink-muted); font-style:italic; }
+.overlay-body pre { background:var(--parchment-dark); padding:1rem; border-left:3px solid var(--gold); font-size:0.8rem; overflow-x:auto; margin:0.8rem 0; }
+.overlay-body hr { border:none; border-top:1px solid var(--parchment-mid); margin:1.5rem 0; }
+.overlay-body a { color:var(--terracotta); }
+.overlay-hint { font-family:'Inter',sans-serif; font-size:0.7rem; color:var(--fog); margin-top:0.8rem; text-align:center; }
+
+@media print {
+  body > *:not(.overlay) { display:none !important; }
+  .overlay { display:block !important; position:static; background:none; padding:0; }
+  .overlay-box { box-shadow:none; border-radius:0; padding:0; border:none; }
+  .overlay-header,.overlay-actions,.overlay-hint { display:none !important; }
+  .overlay-body { max-height:none; overflow:visible; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-topo"></div>
+  <div class="header-deco">
+    <svg width="220" height="160" viewBox="0 0 220 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="40" x2="220" y2="40" stroke="white" stroke-width="0.4" stroke-dasharray="4 6"/>
+      <line x1="0" y1="80" x2="220" y2="80" stroke="white" stroke-width="0.4" stroke-dasharray="4 6"/>
+      <line x1="0" y1="120" x2="220" y2="120" stroke="white" stroke-width="0.4" stroke-dasharray="4 6"/>
+      <line x1="55" y1="0" x2="55" y2="160" stroke="white" stroke-width="0.4" stroke-dasharray="4 6"/>
+      <line x1="110" y1="0" x2="110" y2="160" stroke="white" stroke-width="0.4" stroke-dasharray="4 6"/>
+      <line x1="165" y1="0" x2="165" y2="160" stroke="white" stroke-width="0.4" stroke-dasharray="4 6"/>
+      <circle cx="110" cy="82" r="64" stroke="white" stroke-width="0.6"/>
+      <circle cx="110" cy="82" r="56" stroke="white" stroke-width="0.3" stroke-dasharray="2 4"/>
+      <circle cx="110" cy="82" r="42" stroke="white" stroke-width="0.5"/>
+      <circle cx="110" cy="82" r="14" stroke="white" stroke-width="0.6"/>
+      <circle cx="110" cy="82" r="4" fill="white" opacity="0.6"/>
+      <line x1="110" y1="18" x2="110" y2="26" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="110" y1="138" x2="110" y2="146" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="46" y1="82" x2="54" y2="82" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="166" y1="82" x2="174" y2="82" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="64.7" y1="36.7" x2="70.4" y2="42.4" stroke="white" stroke-width="0.7" stroke-linecap="round"/>
+      <line x1="155.3" y1="36.7" x2="149.6" y2="42.4" stroke="white" stroke-width="0.7" stroke-linecap="round"/>
+      <line x1="64.7" y1="127.3" x2="70.4" y2="121.6" stroke="white" stroke-width="0.7" stroke-linecap="round"/>
+      <line x1="155.3" y1="127.3" x2="149.6" y2="121.6" stroke="white" stroke-width="0.7" stroke-linecap="round"/>
+      <polygon points="110,20 114,72 110,68 106,72" fill="white" opacity="0.9"/>
+      <polygon points="110,144 114,92 110,96 106,92" fill="white" opacity="0.35"/>
+      <polygon points="172,82 120,78 124,82 120,86" fill="white" opacity="0.5"/>
+      <polygon points="48,82 100,78 96,82 100,86" fill="white" opacity="0.5"/>
+      <text x="110" y="14" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="white" opacity="0.85" font-style="italic">N</text>
+      <path d="M170 30 Q178 45 174 58 Q180 70 176 82 Q182 96 175 108 Q178 120 170 132" stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.5"/>
+      <path d="M30 95 L38 78 L46 95" stroke="white" stroke-width="0.7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+      <path d="M20 100 L30 82 L40 100" stroke="white" stroke-width="0.7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+      <circle cx="62" cy="110" r="2" fill="white" opacity="0.4"/>
+      <circle cx="80" cy="118" r="1.5" fill="white" opacity="0.3"/>
+      <line x1="62" y1="110" x2="80" y2="118" stroke="white" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.3"/>
+    </svg>
+  </div>
+  <div class="header-inner">
+    <div class="header-eyebrow">A Travel Design Studio</div>
+    <div class="header-title">Beyond the <em>Frame</em></div>
+    <div class="header-rule"><div class="header-rule-line"></div><div class="header-rule-dot"></div><div class="header-rule-line"></div></div>
+    <div class="header-sub">Presence over perfection &nbsp;·&nbsp; Authenticity over spectacle</div>
+  </div>
+</header>
+
+<div id="sub-nav">
+  <button class="sub-nav-back" onclick="goHome()">
+    <svg viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Start over
+  </button>
+  <span class="sub-nav-mode" id="sub-nav-mode"></span>
+</div>
+
+<main>
+  <div id="home">
+    <p class="home-intro">Where do you want to go next?</p>
+    <p class="home-sub">Tell PJ what you have in mind — a dream, a destination, or a plan you want reviewed.</p>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startMode('trip')">
+        <div class="card-icon">
+          <svg viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="9" stroke="#2d3f5c" stroke-width="1.5"/>
+            <ellipse cx="11" cy="11" rx="3.8" ry="9" stroke="#2d3f5c" stroke-width="1.5"/>
+            <line x1="2" y1="11" x2="20" y2="11" stroke="#2d3f5c" stroke-width="1.5"/>
+            <line x1="5.5" y1="5.5" x2="16.5" y2="5.5" stroke="#2d3f5c" stroke-width="1" stroke-dasharray="1.5 1.5"/>
+            <line x1="5.5" y1="16.5" x2="16.5" y2="16.5" stroke="#2d3f5c" stroke-width="1" stroke-dasharray="1.5 1.5"/>
+          </svg>
+        </div>
+        <div class="card-title">Plan a trip</div>
+        <div class="card-desc">Tell PJ what you have in mind. I'll ask the right questions and design the journey — whether you know where you're going or not.</div>
+        <div class="card-hint">Works for a vague idea or a confirmed destination ↓</div>
+      </div>
+      <div class="mode-card" onclick="startMode('evaluate')">
+        <div class="card-icon">
+          <svg viewBox="0 0 22 22" fill="none">
+            <path d="M11 2.5L13.3 8.1L19.3 8.55L14.9 12.3L16.3 18.2L11 15.1L5.7 18.2L7.1 12.3L2.7 8.55L8.7 8.1L11 2.5Z" stroke="#2d3f5c" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="card-title">Evaluate a plan</div>
+        <div class="card-desc">Already have an itinerary? Share it and I'll give you an honest read on pacing, authenticity, and what could be sharper.</div>
+        <div class="card-hint">Come back here once you have a plan to review ↑</div>
+      </div>
+    </div>
+    <div class="home-avatar">
+      <div class="avatar-ring" id="avatar-ring" onclick="document.getElementById('avatar-input').click()">
+        <svg id="avatar-placeholder" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="10" r="5" stroke="#3d5070" stroke-width="1.5"/>
+          <path d="M4 24c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="#3d5070" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <img id="avatar-img" style="display:none" src="" alt="PJ"/>
+        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="loadAvatar(event)"/>
+      </div>
+      <div class="avatar-text">
+        <strong id="avatar-name">Set your PJ avatar</strong>
+        <span id="avatar-subtext">Optional · click to upload a photo</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="chat-view">
+    <div class="chat-empty" id="chat-empty">
+      <strong id="chat-empty-title">PJ is ready when you are</strong>
+      <p id="chat-empty-body">The more context you share — travel style, who you are going with, what pace feels right — the better the journey.</p>
+    </div>
+    <div class="loading-status" id="loading-status">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+      </svg>
+      <span id="loading-text">PJ is thinking...</span>
+      <span class="loading-cancel" onclick="cancelRequest()">Cancel</span>
+    </div>
+    <div id="messages"></div>
+    <div class="save-bar" id="save-bar">
+      <span class="save-bar-label" id="save-bar-label">Save or export</span>
+      <div><button class="btn-save" onclick="openSaveOverlay()">Save journey</button></div>
+    </div>
+    <div id="input-footer">
+      <div class="input-wrap">
+        <div class="input-label">To PJ</div>
+        <textarea id="user-input" rows="2" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="input-row">
+          <span class="char-hint">Shift+Enter for new line · Enter to send</span>
+          <button class="btn-send" id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="overlay" id="save-overlay" onclick="handleOverlayClick(event)">
+  <div class="overlay-box">
+    <div class="overlay-header">
+      <div>
+        <div class="overlay-title">Beyond the Frame</div>
+        <div class="overlay-meta" id="overlay-meta"></div>
+      </div>
+      <button class="overlay-close" onclick="closeSaveOverlay()">&#x00D7;</button>
+    </div>
+    <div class="overlay-actions">
+      <button class="overlay-btn" id="overlay-pdf-btn" onclick="overlayPrint()">Save as PDF</button>
+      <button class="overlay-btn" id="overlay-copy-btn" onclick="overlayCopy()">Select all &amp; copy</button>
+    </div>
+    <div class="overlay-body" id="overlay-body"></div>
+    <div class="overlay-hint">Use Ctrl/Cmd+A to select all, then Ctrl/Cmd+C to copy</div>
+  </div>
+</div>
+
+<script>
+var SYSTEM_PROMPT = [
+  "# BEYOND THE FRAME - PJ",
+  "You are PJ, travel designer for Beyond the Frame.",
+  "Philosophy: Presence over perfection. Authenticity over spectacle. Empathy, balance, verified realism.",
+  "Voice: Warm, confident, sensory but grounded. Never reference internal frameworks or scoring systems.",
+  "Default origin: Seattle, WA unless specified.",
+  "Universal opening (once only): I am PJ, your travel designer from Beyond the Frame.",
+  "INTENT ROUTING - silently identify and route, never ask the user which mode:",
+  "- Vague or destination-unknown: Discovery Mode",
+  "- Destination and duration known: Planning Mode",
+  "- Itinerary submitted: Evaluation Mode",
+  "- Feedback on plan: Reflection Mode",
+  "- Expert/logistics request: Expert Mode",
+  "If key details missing, ask 2-3 focused questions first.",
+  "CALIBRATION (internal only): Score Presence, Authenticity, Empathy, Rhythm, Realism 1-10. CAS 8-10 proceed, 6-7.9 refine, below 6 redesign.",
+  "VERIFICATION: Lodging 6mo, Dining 3-6mo, Rates 3mo, Season 12mo, Travel times 12mo plus 15-20 percent buffer.",
+  "Transparency header verbatim for Planning and Evaluation: Verified [Month YYYY] - Data reliability: [High|Moderate|Indicative] / Sources: [...] / Open-status: [Yes|Partial|Unknown]",
+  "Never invent venues, prices, or operators.",
+  "DISCOVERY MODE: Opening Hook, Three Vignettes (Contrast/Complement/Wildcard), Snapshot Table (Destination|Vibe|Duration|Ideal Months|Est Cost USD), close with which feels most like your kind of trip.",
+  "PLANNING MODE: Transparency header first, Journey Map link second, Full day cards (Day [#] Title, Mood, Arc Morning-Midday-Evening, Transfers, Stay, Meals, Evening Cue), named location paragraph plus 2-4 bullets, Cost table, Next Steps plus Reflection Cue. NEVER truncate - output ALL days.",
+  "EVALUATION MODE: Transparency header, How it Feels, What Works, What Could Evolve, Overall Alignment.",
+  "REFLECTION MODE: Acknowledge, state logic, revised section only, confirm.",
+  "EXPERT MODE: Journey Map, Route Table, Trade-off Matrix, minimal narrative.",
+  "SHARED: USD plus local. F for US, C elsewhere. Miles plus km. Never: hidden gem, breathtaking, unforgettable, world-class. Use [[Place Name]] on first mention. End every response with one refinement question.",
+  "READ BEFORE YOU GO: Offer once after destination confirmed. 2-3 titles, memoir or literary non-fiction, Goodreads 4.0+ with 500+ reviews.",
+  "FORMATTING: Tables and day-cards in clean markdown. Conversational replies use prose not bullets."
+].join("\n");
+
+var MAX_TOKENS = { trip: 4000, evaluate: 2000 };
+var modeLabels = { trip: "Planning a trip", evaluate: "Evaluating a plan" };
+var modePlaceholders = {
+  trip: "Tell PJ what you have in mind...",
+  evaluate: "Paste your itinerary here..."
+};
+var modePlaceholdersActive = {
+  trip: "Ask PJ to adjust anything - pacing, meals, budget...",
+  evaluate: "Ask PJ to expand on any point..."
+};
+var modeSeed = {
+  trip: "I am starting a trip planning conversation. Greet me as PJ with your universal opening, then invite me to share what I have in mind. Silently determine from my response whether this needs discovery or planning.",
+  evaluate: "I am starting an evaluation session. Greet me as PJ and invite me to share the itinerary I would like evaluated."
+};
+var loadingCycles = [
+  "PJ is thinking...",
+  "Designing your journey...",
+  "Checking the details...",
+  "Pulling it all together..."
+];
+
+var chatHistory = [];
+var currentMode = "";
+var hasReply = false;
+var substantiveReplyCount = 0;
+var planDelivered = false;
+var PJ_AVATAR_URL = null;
+var currentController = null;
+var loadingTimer = null;
+
+function loadAvatar(e) {
+  var file = e.target.files[0];
+  if (!file) { return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    PJ_AVATAR_URL = ev.target.result;
+    applyAvatar();
+    try { window.storage.set("pj-avatar", PJ_AVATAR_URL); } catch(err) {}
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyAvatar() {
+  document.getElementById("avatar-img").src = PJ_AVATAR_URL;
+  document.getElementById("avatar-img").style.display = "block";
+  document.getElementById("avatar-placeholder").style.display = "none";
+  document.getElementById("avatar-name").textContent = "PJ";
+  document.getElementById("avatar-subtext").textContent = "Your travel designer · click to change";
+  document.getElementById("avatar-ring").style.border = "2px solid #c0cde0";
+}
+
+function initAvatar() {
+  try {
+    window.storage.get("pj-avatar").then(function(s) {
+      if (s && s.value) { PJ_AVATAR_URL = s.value; applyAvatar(); }
+    }).catch(function() {});
+  } catch(e) {}
+}
+
+function makeAvatar(size) {
+  var el = document.createElement("div");
+  el.className = "pj-avatar";
+  el.style.width = size + "px";
+  el.style.height = size + "px";
+  if (PJ_AVATAR_URL) {
+    var img = document.createElement("img");
+    img.src = PJ_AVATAR_URL;
+    img.alt = "PJ";
+    img.style.cssText = "width:100%;height:100%;object-fit:cover;object-position:center 65%;border-radius:50%";
+    el.appendChild(img);
+  } else {
+    el.innerHTML = '<svg viewBox="0 0 38 38" fill="none" style="width:' + size + 'px;height:' + size + 'px"><circle cx="19" cy="19" r="19" fill="#e8ecf3"/><circle cx="19" cy="15" r="6" stroke="#3d5070" stroke-width="1.5"/><path d="M7 34c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#3d5070" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  }
+  return el;
+}
+
+function goHome() {
+  document.getElementById("home").style.display = "block";
+  document.getElementById("chat-view").style.display = "none";
+  document.getElementById("sub-nav").classList.remove("visible");
+  document.getElementById("messages").innerHTML = "";
+  document.getElementById("save-bar").classList.remove("visible");
+  document.getElementById("chat-empty").classList.remove("visible");
+  document.getElementById("input-footer").style.display = "block";
+  chatHistory = [];
+  currentMode = "";
+  hasReply = false;
+  substantiveReplyCount = 0;
+  planDelivered = false;
+}
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
+function isSubstantive(md) {
+  return md.length > 300 || md.indexOf("|") !== -1 || /day \d+/i.test(md);
+}
+
+function isPlanDelivery(md) {
+  return (/day \d+/i.test(md) || md.indexOf("Journey Map") !== -1) && md.length > 800;
+}
+
+function parseDestinations(md) {
+  var lines = md.split("\n");
+  var inTable = false;
+  var dest = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    if (line.indexOf("|") === -1) { inTable = false; continue; }
+    var cells = line.split("|").map(function(c) { return c.trim(); }).filter(function(c) { return c.length > 0; });
+    if (!cells.length) { continue; }
+    var row = cells.join(" ").toLowerCase();
+    if (row.indexOf("destination") !== -1 && (row.indexOf("vibe") !== -1 || row.indexOf("ideal month") !== -1 || row.indexOf("est. cost") !== -1)) { inTable = true; continue; }
+    if (cells[0].replace(/[-: ]/g, "").length === 0) { continue; }
+    if (row.indexOf("category") !== -1 || row.indexOf("lodging") !== -1 || row.indexOf("meals") !== -1 || row.indexOf("transport") !== -1 || row.indexOf("total") !== -1 || row.indexOf("activities") !== -1) { inTable = false; continue; }
+    if (inTable && cells[0].length > 2) { dest.push(cells[0]); }
+  }
+  var unique = [];
+  dest.forEach(function(d) { if (unique.indexOf(d) === -1) { unique.push(d); } });
+  return unique.slice(0, 5);
+}
+
+function buildDestPicker(destinations) {
+  var labels = ["A","B","C","D","E"];
+  var selected = null;
+  var wrap = document.createElement("div"); wrap.className = "dest-picker";
+  var lbl = document.createElement("div"); lbl.className = "dest-picker-label"; lbl.textContent = "Which of these interests you?";
+  wrap.appendChild(lbl);
+  var opts = document.createElement("div"); opts.className = "dest-options";
+  var planBtn = document.createElement("button"); planBtn.className = "btn-plan-now";
+  planBtn.textContent = "Build this itinerary"; planBtn.disabled = true;
+  planBtn.onclick = function() { if (selected) { confirmDestination(selected); } };
+  var otherRow = document.createElement("div"); otherRow.className = "dest-other";
+  var otherInput = document.createElement("input"); otherInput.type = "text"; otherInput.placeholder = "Describe where you have in mind...";
+  otherInput.oninput = function() { selected = otherInput.value.trim(); planBtn.disabled = !selected; };
+  otherInput.onkeydown = function(e) { if (e.key === "Enter" && selected) { e.preventDefault(); confirmDestination(selected); } };
+  otherRow.appendChild(otherInput);
+  destinations.forEach(function(d, i) {
+    var btn = document.createElement("button"); btn.className = "dest-option";
+    btn.innerHTML = '<span class="opt-key">' + labels[i] + "</span>" + d;
+    btn.onclick = function() {
+      opts.querySelectorAll(".dest-option").forEach(function(b) { b.classList.remove("selected"); });
+      btn.classList.add("selected"); selected = d; otherRow.classList.remove("visible"); planBtn.disabled = false;
+    };
+    opts.appendChild(btn);
+  });
+  var otherBtn = document.createElement("button"); otherBtn.className = "dest-option";
+  otherBtn.innerHTML = '<span class="opt-key">...</span>Something else';
+  otherBtn.onclick = function() {
+    opts.querySelectorAll(".dest-option").forEach(function(b) { b.classList.remove("selected"); });
+    otherBtn.classList.add("selected"); selected = null; planBtn.disabled = true;
+    otherRow.classList.add("visible"); otherInput.focus();
+  };
+  opts.appendChild(otherBtn);
+  wrap.appendChild(opts);
+  wrap.appendChild(otherRow);
+  var actionRow = document.createElement("div"); actionRow.style.cssText = "display:flex;justify-content:flex-end;margin-top:0.5rem;";
+  actionRow.appendChild(planBtn); wrap.appendChild(actionRow);
+  return wrap;
+}
+
+function confirmDestination(destination) {
+  document.getElementById("input-footer").style.display = "block";
+  var msg = "I would like to plan a trip to: " + destination + ". Please build out the full itinerary.";
+  addMessage("user", msg);
+  chatHistory.push({ role: "user", content: msg });
+  callPJ(msg, false);
+}
+
+function buildRefinementCue() {
+  var cue = document.createElement("div"); cue.className = "refinement-cue";
+  cue.innerHTML = "<strong>Refine this journey</strong>Adjust pacing, swap meals, change the budget, or ask about alternatives — just tell PJ below.";
+  return cue;
+}
+
+function showError(msg) {
+  var msgs = document.getElementById("messages");
+  var banner = document.createElement("div"); banner.className = "error-banner";
+  banner.innerHTML = '<svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#7a2020" stroke-width="1.5"/><line x1="8" y1="5" x2="8" y2="9" stroke="#7a2020" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.8" fill="#7a2020"/></svg>' + msg;
+  msgs.appendChild(banner); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showLoading(isLong) {
+  var el = document.getElementById("loading-status");
+  var txt = document.getElementById("loading-text");
+  txt.textContent = isLong ? "PJ is designing your journey..." : "PJ is thinking...";
+  el.classList.add("visible");
+  if (isLong) {
+    var i = 1;
+    loadingTimer = setInterval(function() {
+      if (i < loadingCycles.length) { txt.textContent = loadingCycles[i]; i++; }
+    }, 18000);
+  }
+}
+
+function hideLoading() {
+  document.getElementById("loading-status").classList.remove("visible");
+  if (loadingTimer) { clearInterval(loadingTimer); loadingTimer = null; }
+}
+
+function cancelRequest() {
+  hideLoading();
+  removeTyping();
+  document.getElementById("send-btn").disabled = false;
+  showError("Request cancelled. Feel free to try again or rephrase.");
+}
+
+function updatePlaceholder() {
+  if (!hasReply) { return; }
+  document.getElementById("user-input").placeholder = modePlaceholdersActive[currentMode] || "Continue the conversation...";
+}
+
+function startMode(mode) {
+  currentMode = mode; chatHistory = []; hasReply = false; substantiveReplyCount = 0; planDelivered = false;
+  document.getElementById("messages").innerHTML = "";
+  document.getElementById("save-bar").classList.remove("visible");
+  document.getElementById("home").style.display = "none";
+  document.getElementById("chat-view").style.display = "block";
+  document.getElementById("sub-nav").classList.add("visible");
+  document.getElementById("sub-nav-mode").textContent = modeLabels[mode];
+  document.getElementById("input-footer").style.display = "block";
+  document.getElementById("user-input").placeholder = modePlaceholders[mode];
+  var t = mode === "evaluate" ? "Paste your itinerary below" : "PJ is ready when you are";
+  var b = mode === "evaluate"
+    ? "Share any itinerary — rough notes or a full plan. PJ will give you an honest read on pacing, authenticity, and what could be sharper."
+    : "The more context you share — travel style, who you are going with, what pace feels right — the better the journey.";
+  document.getElementById("chat-empty-title").textContent = t;
+  document.getElementById("chat-empty-body").textContent = b;
+  document.getElementById("chat-empty").classList.add("visible");
+  callPJ(modeSeed[mode], true);
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function sendMessage() {
+  var inp = document.getElementById("user-input");
+  var text = inp.value.trim();
+  if (!text) { return; }
+  inp.value = ""; inp.style.height = "auto";
+  addMessage("user", text);
+  chatHistory.push({ role: "user", content: text });
+  callPJ(text, false);
+}
+
+function addMessage(role, md) {
+  var msgs = document.getElementById("messages");
+  var wrap = document.createElement("div"); wrap.className = "msg " + role;
+  if (role === "assistant") {
+    var intro = document.createElement("div"); intro.className = "pj-intro";
+    var av = makeAvatar(38);
+    var right = document.createElement("div"); right.style.flex = "1";
+    var name = document.createElement("div"); name.className = "pj-name"; name.textContent = "PJ";
+    var bubble = document.createElement("div"); bubble.className = "bubble";
+    bubble.innerHTML = marked.parse(md);
+    right.appendChild(name); right.appendChild(bubble); intro.appendChild(av); intro.appendChild(right); wrap.appendChild(intro);
+    if (currentMode === "trip" && hasReply) {
+      var destinations = parseDestinations(md);
+      if (destinations.length >= 2) { wrap.appendChild(buildDestPicker(destinations)); document.getElementById("input-footer").style.display = "none"; }
+    }
+    if (isPlanDelivery(md) && !planDelivered) {
+      planDelivered = true; wrap.appendChild(buildRefinementCue());
+      document.getElementById("save-bar-label").textContent = "Journey ready to save";
+    }
+  } else {
+    var b2 = document.createElement("div"); b2.className = "bubble"; b2.textContent = md; wrap.appendChild(b2);
+  }
+  msgs.appendChild(wrap); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function openSaveOverlay() {
+  var bubbles = document.querySelectorAll(".msg.assistant .bubble");
+  if (!bubbles.length) { return; }
+  var date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  var label = currentMode === "evaluate" ? "Evaluation · Prepared by PJ" : "Journey Plan · Prepared by PJ";
+  document.getElementById("overlay-meta").textContent = label + " · " + date;
+  document.getElementById("overlay-body").innerHTML = Array.from(bubbles).map(function(b) { return b.innerHTML; }).join("<hr>");
+  document.getElementById("save-overlay").classList.add("open");
+}
+function closeSaveOverlay() { document.getElementById("save-overlay").classList.remove("open"); }
+function handleOverlayClick(e) { if (e.target === document.getElementById("save-overlay")) { closeSaveOverlay(); } }
+
+function overlayCopy() {
+  var body = document.getElementById("overlay-body");
+  var range = document.createRange(); range.selectNodeContents(body);
+  var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  var btn = document.getElementById("overlay-copy-btn"); btn.textContent = "Selected - press Ctrl/Cmd+C";
+  setTimeout(function() { btn.textContent = "Select all & copy"; }, 3000);
+}
+
+function overlayPDF() {
+  var btn = document.getElementById("overlay-pdf-btn"); btn.textContent = "Generating..."; btn.disabled = true;
+  var body = document.getElementById("overlay-body");
+  html2canvas(body, { scale: 2, useCORS: true, backgroundColor: "#f7f2e8" }).then(function(canvas) {
+    var pdf = new window.jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    var pW = pdf.internal.pageSize.getWidth(); var pH = pdf.internal.pageSize.getHeight();
+    var m = 14; var iW = pW - m * 2; var iH = (canvas.height * iW) / canvas.width;
+    var date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    var label = currentMode === "evaluate" ? "Evaluation · Prepared by PJ" : "Journey Plan · Prepared by PJ";
+    var y = m;
+    pdf.setFontSize(16); pdf.setTextColor(30, 43, 66); pdf.text("Beyond the Frame", m, y); y += 7;
+    pdf.setFontSize(9); pdf.setTextColor(107, 92, 70); pdf.text(label + " · " + date, m, y); y += 4;
+    pdf.setDrawColor(201, 148, 58); pdf.line(m, y, pW - m, y); y += 6;
+    var avH = pH - y - m; var rem = iH; var sY = 0;
+    while (rem > 0) {
+      var sH = Math.min(rem, avH);
+      var sc = document.createElement("canvas"); sc.width = canvas.width; sc.height = Math.round((sH / iH) * canvas.height);
+      sc.getContext("2d").drawImage(canvas, 0, sY, canvas.width, sc.height, 0, 0, canvas.width, sc.height);
+      pdf.addImage(sc.toDataURL("image/png"), "PNG", m, y, iW, sH);
+      rem -= sH; sY += sc.height;
+      if (rem > 0) { pdf.addPage(); y = m; avH = pH - m * 2; }
+    }
+    pdf.save("btf-journey.pdf"); btn.textContent = "Save as PDF"; btn.disabled = false;
+  }).catch(function() {
+    alert("PDF generation failed. Try Select & Copy instead."); btn.textContent = "Save as PDF"; btn.disabled = false;
+  });
+}
+
+function showTyping() {
+  var msgs = document.getElementById("messages");
+  var d = document.createElement("div"); d.className = "msg assistant"; d.id = "typing-ind";
+  var intro = document.createElement("div"); intro.className = "pj-intro";
+  var right = document.createElement("div"); right.style.flex = "1";
+  var name = document.createElement("div"); name.className = "pj-name"; name.textContent = "PJ";
+  var bubble = document.createElement("div"); bubble.className = "bubble";
+  bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  right.appendChild(name); right.appendChild(bubble); intro.appendChild(makeAvatar(38)); intro.appendChild(right);
+  d.appendChild(intro); msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() { var t = document.getElementById("typing-ind"); if (t) { t.remove(); } }
+
+function callPJ(userText, isSeed) {
+  var btn = document.getElementById("send-btn"); btn.disabled = true;
+  var isLong = currentMode === "trip" && chatHistory.length > 2;
+  showLoading(isLong);
+  showTyping();
+  currentController = null;
+  var messages = isSeed ? [{ role: "user", content: userText }] : chatHistory;
+  var body = JSON.stringify({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: MAX_TOKENS[currentMode] || 2000,
+    system: SYSTEM_PROMPT,
+    messages: messages
+  });
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: body
+  }).then(function(res) {
+    return res.json();
+  }).then(function(data) {
+    hideLoading(); removeTyping();
+    var reply = null;
+    if (data.content) {
+      for (var i = 0; i < data.content.length; i++) {
+        if (data.content[i].type === "text") { reply = data.content[i].text; break; }
+      }
+    }
+    if (!reply) { showError("PJ could not respond right now. Please try again."); btn.disabled = false; return; }
+    if (!isSeed) { chatHistory.push({ role: "assistant", content: reply }); }
+    else { chatHistory = [{ role: "user", content: userText }, { role: "assistant", content: reply }]; }
+    addMessage("assistant", reply);
+    if (!hasReply) { hasReply = true; document.getElementById("chat-empty").classList.remove("visible"); }
+    if (isSubstantive(reply)) { substantiveReplyCount++; if (substantiveReplyCount >= 1) { document.getElementById("save-bar").classList.add("visible"); } }
+    updatePlaceholder();
+    btn.disabled = false;
+  }).catch(function(err) {
+    hideLoading(); removeTyping();
+    showError("Could not reach PJ - please check your connection and try again.");
+    btn.disabled = false;
+  });
+}
+
+initAvatar();
+</script>
+</body>
+</html>
